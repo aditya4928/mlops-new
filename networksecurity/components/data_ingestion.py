@@ -36,16 +36,17 @@ class DataIngestion:
             self.mongo_client=pymongo.MongoClient(MONGO_DB_URL)
             collection=self.mongo_client[database_name][collection_name]
 
-            df=pd.DataFrame(list(collection.find()))
-            if "_id" in df.columns.to_list():
-                df=df.drop(columns=["_id"],axis=1)
+            df=pd.DataFrame(list(collection.find())) #converting Python list of dictionaries.
+            #collection.find() → Gets all documents in the collection. Each document is like a dictionary.
+            if "_id" in df.columns.to_list(): #Gets a list of all column names in the DataFrame and removing
+                df=df.drop(columns=["_id"],axis=1) 
             
             df.replace({"na":np.nan},inplace=True)
             return df
         except Exception as e:
             raise NetworkSecurityException
         
-    def export_data_into_feature_store(self,dataframe: pd.DataFrame):
+    def export_data_into_feature_store(self,dataframe: pd.DataFrame): #entire raw data (raw.csv) inside dataingestion/artifact/featurestore
         try:
             feature_store_file_path=self.data_ingestion_config.feature_store_file_path
             #creating folder
